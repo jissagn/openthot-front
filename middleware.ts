@@ -1,18 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
 // import { isAuthenticated } from '@lib/auth';
 
-// FROM https://maxschmitt.me/posts/next-js-http-only-cookie-auth-tokens
+// inspired by https://maxschmitt.me/posts/next-js-http-only-cookie-auth-tokens
 
-import httpProxy from "http-proxy";
-import Cookies from "cookies";
-import url from "url";
-import { IncomingMessage } from 'http';
-import axios from 'axios';
+// import httpProxy from "http-proxy";
+// import Cookies from "cookies";
+// import url from "url";
+// import { IncomingMessage } from 'http';
+// import axios from 'axios';
 
 
 
 const API_BASE_URL = "http://127.0.0.1:8000/";
 const API_URL = API_BASE_URL + "api/v1/"; // TODO:
+
+
+// async function regentoken(token: string) {
+//     const reqInit: RequestInit = {
+//         method: "GET",
+//         body: JSON.stringify({token: token})
+//       };
+//       const res = await fetch(API_BASE_URL, reqInit);
+//       if(res.ok) {
+
+//       }
+// }
 
 export async function middleware(request: NextRequest) {
 
@@ -43,7 +55,7 @@ export async function middleware(request: NextRequest) {
     if (request.nextUrl.pathname.startsWith('/api/')) {
         // API-related
         if (request.nextUrl.pathname.startsWith('/api/login')) {
-            const backend_url = `http://127.0.0.1:8000/auth/jwt/login`
+            const backend_url = `http://127.0.0.1:8000/api/v1/auth/jwt/login`
             const origFormData = await request.formData();
             const data = await (await fetch(backend_url,
                 {
@@ -56,28 +68,58 @@ export async function middleware(request: NextRequest) {
             response.cookies.set('auth-token', access_token, {
                 httpOnly: true,
                 sameSite: 'strict',
+                maxAge: 3500,  // let it expire a bit before true expire
             });
             return response;
         } else {
             const authToken = request.cookies.get("auth-token")?.value;
             if (!authToken) {
-                return NextResponse.json({ "detail": "Y a pas moyen" });
+                return NextResponse.json({ "detail": "You are not logged in" });
+            }
+            // request.cookies.ge
+            // TODO: expiratio
+
+            let target = API_URL + request.nextUrl.pathname.replace(/\/api\//, '');
+            if (request.nextUrl.searchParams.toString()) {
+                target += "/?" + request.nextUrl.searchParams
+            }
+            // if(request.nextUrl.searchParams)
+            let origFormData;
+            try {
+                origFormData = await request.formData();
+            } catch (error) {
+                origFormData = null
             }
 
-            const target = API_URL + request.nextUrl.pathname.replace(/\/api\//, '') + "/?" + request.nextUrl.searchParams
-            // if(request.nextUrl.searchParams)
-            const origFormData = await request.formData();
-            const data = await (await fetch(target,
-                {
-                    headers: new Headers({
-                        'Authorization': `Bearer ${authToken}`
-                      }),
-                    method: request.method,
-                    body: origFormData
-                })).json();
+            if (target.endsWith("/audio")) {
 
-            // TODO: check return code and act accordingly
-            return NextResponse.json({ data });
+                const backend_req = await fetch(target,
+                    {
+                        headers: new Headers({
+                            'Authorization': `Bearer ${authToken}`
+                        }),
+                        method: request.method,
+                        body: origFormData
+                    })
+                const data = await backend_req.blob();
+                const response = new NextResponse(data);
+                const cacheControlValue = backend_req.headers.get("Cache-Control");
+                if (cacheControlValue) { response.headers.set("Cache-Control", cacheControlValue); }
+                return response;
+            } else {
+
+                const data = await (await fetch(target,
+                    {
+                        headers: new Headers({
+                            'Authorization': `Bearer ${authToken}`
+                        }),
+                        method: request.method,
+                        body: origFormData
+                    })).json();
+
+                // TODO: check return code and act accordingly
+                return NextResponse.json({ data });
+            }
 
 
         }
@@ -93,10 +135,10 @@ export async function middleware(request: NextRequest) {
         } else {
             if (request.nextUrl.pathname.startsWith('/login')) {
                 const redir = request.nextUrl.searchParams.get("redirect");
-                if (redir){
+                if (redir) {
                     return NextResponse.redirect(new URL(redir, request.url));
                 }
-                
+
             }
         }
 

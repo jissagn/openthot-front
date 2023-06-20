@@ -23,10 +23,12 @@
     "next": "13.3.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "typescript": "5.0.4"
+    "typescript": "5.0.4",
+    "wavesurfer.js": "^6.6.3"
   },
   "devDependencies": {
     "@types/cookies": "^0.7.7",
-    "@types/http-proxy": "^1.17.11"
+    "@types/http-proxy": "^1.17.11",
+    "@types/wavesurfer.js": "^6.0.6"
   }
 }

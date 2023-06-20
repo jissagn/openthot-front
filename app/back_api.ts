@@ -3,8 +3,7 @@ import { cookies } from "next/headers";
 const url = "http://127.0.0.1:8000/";
 
 export async function getBackendData(method: string, endpoint: string, body: any = null): Promise<any> {
-    // const bearer_token = localStorage.getItem('bearer_token');
-  
+      
     const authToken = cookies().get('auth-token')?.value;
     const reqInit: RequestInit = {
       method: method,
