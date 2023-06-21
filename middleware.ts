@@ -1,3 +1,5 @@
+import { stat } from 'fs';
+import { init } from 'next/dist/compiled/@vercel/og/satori';
 import { NextRequest, NextResponse } from 'next/server';
 // import { isAuthenticated } from '@lib/auth';
 
@@ -57,78 +59,112 @@ export async function middleware(request: NextRequest) {
         if (request.nextUrl.pathname.startsWith('/api/login')) {
             const backend_url = `http://127.0.0.1:8000/api/v1/auth/jwt/login`
             const origFormData = await request.formData();
-            const data = await (await fetch(backend_url,
+            const backReq = await fetch(backend_url,
                 {
                     method: 'POST',
                     body: origFormData
-                })).json();
+                });
+            const data = await backReq.json()
             console.log(data); // TODO: check that login failed or not
-            const access_token = data.access_token
-            let response = NextResponse.json({ "details": "logged in" });
-            response.cookies.set('auth-token', access_token, {
-                httpOnly: true,
-                sameSite: 'strict',
-                maxAge: 3500,  // let it expire a bit before true expire
-            });
-            return response;
-        } else {
+            if (backReq.status == 200) {
+                const access_token = data.access_token
+                let response = NextResponse.json({ "details": "logged in" }, { status: backReq.status });
+                response.cookies.set('auth-token', access_token, {
+                    httpOnly: true,
+                    sameSite: 'strict',
+                    maxAge: 3500,  // let it expire a bit before true expire
+                });
+                return response;
+            } else {
+                return NextResponse.json({ "details": "failed to log in" }, { status: backReq.status });
+            }
+        }
+        else if (request.nextUrl.pathname.startsWith('/api/logout')) {
+            const backend_url = `http://127.0.0.1:8000/api/v1/auth/jwt/logout`
             const authToken = request.cookies.get("auth-token")?.value;
             if (!authToken) {
-                return NextResponse.json({ "detail": "You are not logged in" });
+                return NextResponse.json({ "detail": "You are not logged in" }, { status: 401 });
             }
-            // request.cookies.ge
+            const response = await fetch(backend_url,
+                {
+                    headers: new Headers({
+                        'Authorization': `Bearer ${authToken}`
+                    }),
+                    method: 'POST',
+                });
+            if (response.status == 204) {
+                let response = NextResponse.json({ "details": "logged out" });
+                response.cookies.delete("auth-token");
+                return response
+            }
+        }
+        // else if (request.nextUrl.pathname.startsWith('/api/password_forgotten')) {
+        //     const backend_url = `http://127.0.0.1:8000/api/v1/auth/forgot-password`
+        //     const origFormData = await request.formData();
+        //     const email = origFormData.get("email");
+        //     const response = await fetch(backend_url,
+        //         {
+        //             method: 'POST',
+        //             body: JSON.stringify({ "email": email })
+        //         });
+        //     if (response.status == 202) {
+        //         return NextResponse.json({ "details": "success. You've been sent a temporary token." })
+        //     }
+        // }
+        else {
+            const authToken = request.cookies.get("auth-token")?.value;
+            if (!authToken) {
+                return NextResponse.json({ "detail": "You are not logged in" }, { status: 401 });
+            }
+            let headers = new Headers({
+                'Authorization': `Bearer ${authToken}`
+            })
+
             // TODO: expiratio
 
             let target = API_URL + request.nextUrl.pathname.replace(/\/api\//, '');
             if (request.nextUrl.searchParams.toString()) {
                 target += "/?" + request.nextUrl.searchParams
             }
-            // if(request.nextUrl.searchParams)
-            let origFormData;
-            try {
-                origFormData = await request.formData();
-            } catch (error) {
-                origFormData = null
+
+
+            // distinct sources of body depending on content-type
+            let body = null;
+            const contentType = request.headers.get("content-type")
+            if (contentType == "application/json") {
+                headers.append('content-type', contentType);
+                body = JSON.stringify(await request.json());
+                
+            } else if (contentType?.startsWith("multipart/form-data")) {
+                headers.append('content-type', "multipart/form-data");
+                body = await request.formData();
             }
 
+            const backReq = await fetch(target,
+                {
+                    headers: headers,
+                    method: request.method,
+                    body: body
+                });
+            // TODO: check return code and act accordingly
             if (target.endsWith("/audio")) {
-
-                const backend_req = await fetch(target,
-                    {
-                        headers: new Headers({
-                            'Authorization': `Bearer ${authToken}`
-                        }),
-                        method: request.method,
-                        body: origFormData
-                    })
-                const data = await backend_req.blob();
-                const response = new NextResponse(data);
-                const cacheControlValue = backend_req.headers.get("Cache-Control");
+                const data = await backReq.blob();
+                const response = new NextResponse(data, { status: backReq.status });
+                const cacheControlValue = backReq.headers.get("Cache-Control");
                 if (cacheControlValue) { response.headers.set("Cache-Control", cacheControlValue); }
                 return response;
             } else {
+                const data = await backReq.json();
+                return NextResponse.json({ data }, { status: backReq.status });
 
-                const data = await (await fetch(target,
-                    {
-                        headers: new Headers({
-                            'Authorization': `Bearer ${authToken}`
-                        }),
-                        method: request.method,
-                        body: origFormData
-                    })).json();
-
-                // TODO: check return code and act accordingly
-                return NextResponse.json({ data });
             }
-
-
         }
     }
     else {
         // Pages-related
         const authToken = request.cookies.get("auth-token")?.value;
         if (!authToken) {
-            if (request.nextUrl.pathname.startsWith('/login')) {
+            if (request.nextUrl.pathname == '/login') {
                 return NextResponse.next();
             }
             return NextResponse.redirect(new URL(`/login?redirect=${request.nextUrl.pathname}`, 'http://127.0.0.1:3000')); // TODO: redirect
@@ -249,7 +285,7 @@ export async function middleware(request: NextRequest) {
 
 // // Limit the middleware to paths starting with `/api/`
 export const config = {
-    matcher: ['/api/:path*', '/login', '/interviews', '/interviews/:path*'],  // , '/interviews', '/interviews/:path*'
+    matcher: ['/api/:path*', '/login', '/login/:path*', '/me', '/interviews', '/interviews/:path*'],
     // api: {
     //     bodyParser: false,
     // },

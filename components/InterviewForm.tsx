@@ -4,7 +4,6 @@ import { FormLabel, FormControl, Input, Button } from "@chakra-ui/react";
 // import { FormControl, Input, Button } from "chakra-ui";
 import { useRouter } from "next/navigation";
 import { SetStateAction, useState } from "react";
-import { MouseEvent, useContext, useRef } from "react";
 
 export default function InterviewForm({
     params,

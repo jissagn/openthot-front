@@ -1,21 +1,23 @@
+// FROM https://chakra-templates.dev/forms/authentication
+"use client"
+
 import {
     Flex,
     Box,
     FormControl,
     FormLabel,
     Input,
-    Checkbox,
     Stack,
     Link,
     Button,
     Heading,
-    Text,
     useColorModeValue,
 } from '@chakra-ui/react';
 
 import { SetStateAction, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
+import NextLink from 'next/link'
 
 export default function LoginForm() {
 
@@ -37,13 +39,12 @@ export default function LoginForm() {
         const formData = new FormData();
         formData.append('username', email);
         formData.append('password', password);
-        const res = await fetch(`./api/login`, {  //`http://127.0.0.1:3000/api/login`
+        const res = await fetch(`/api/login`, {
             method: 'POST',
             body: formData
         });
+        const json = await res.json();
         if (res.status == 200) {
-            const json = await res.json();
-            console.log("prout");
             console.log(json);
             if (redirect) {
                 router.push(redirect);
@@ -51,12 +52,8 @@ export default function LoginForm() {
             else {
                 router.push("/");
             }
-
         } else {
-            console.log(res.status);
-            console.log(res.json());
-            console.error('Login failed.')
-
+            console.error(res.status, json);
         }
     }
 
@@ -68,10 +65,10 @@ export default function LoginForm() {
             bg={useColorModeValue('gray.50', 'gray.800')}>
             <Stack spacing={8} mx={'auto'} maxW={'lg'} py={12} px={6}>
                 <Stack align={'center'}>
-                    <Heading fontSize={'4xl'}>Sign in to your account</Heading>
-                    <Text fontSize={'lg'} color={'gray.600'}>
+                    <Heading fontSize={'4xl'}>Connectez-vous</Heading>
+                    {/* <Text fontSize={'lg'} color={'gray.600'}>
                         to enjoy all of our cool <Link color={'blue.400'}>features</Link> ✌️
-                    </Text>
+                    </Text> */}
                 </Stack>
                 <Box
                     rounded={'lg'}
@@ -81,20 +78,20 @@ export default function LoginForm() {
                     <Stack spacing={4}>
                         <form onSubmit={handleSubmit}>
                             <FormControl id="email">
-                                <FormLabel>Email address</FormLabel>
-                                <Input type="email" onChange={handleEmailChange}/>
+                                <FormLabel>Adresse e-mail</FormLabel>
+                                <Input type="email" onChange={handleEmailChange} />
                             </FormControl>
                             <FormControl id="password">
-                                <FormLabel>Password</FormLabel>
-                                <Input type="password"  onChange={handlePasswordChange}/>
+                                <FormLabel>Mot de passe</FormLabel>
+                                <Input type="password" onChange={handlePasswordChange} />
                             </FormControl>
                             <Stack spacing={10}>
                                 <Stack
                                     direction={{ base: 'column', sm: 'row' }}
                                     align={'start'}
                                     justify={'space-between'}>
-                                    <Checkbox>Remember me</Checkbox>
-                                    <Link color={'blue.400'}>Forgot password?</Link>
+                                    {/* <Checkbox>Se souvenir de moi</Checkbox> */}
+                                    <Link color={'blue.400'} as={NextLink} href='/login/reset'>Mot de passe oublié ?</Link>
                                 </Stack>
                                 <Button
                                     type="submit"
@@ -103,7 +100,7 @@ export default function LoginForm() {
                                     _hover={{
                                         bg: 'blue.500',
                                     }}>
-                                    Sign in
+                                    Connexion
                                 </Button>
                             </Stack>
                         </form>

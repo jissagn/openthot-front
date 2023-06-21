@@ -37,3 +37,11 @@ type InterviewData = {
   update_ts: Date;
   upload_ts: Date;
 }
+
+type UserRead = {
+  id: string,
+  email: string,
+  is_active: boolean,
+  is_superuser: boolean,
+  is_verified: boolean
+}
