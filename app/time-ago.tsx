@@ -1,3 +1,5 @@
+"use client"
+
 import TimeAgo from 'javascript-time-ago';
 import fr from 'javascript-time-ago/locale/fr.json';
 

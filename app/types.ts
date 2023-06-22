@@ -29,6 +29,7 @@ type InterviewData = {
   creator_id: number;
   id: number;
   status: string;
+  speakers: Record<string, string>;
   transcript?: SimpleTranscript;
   transcript_duration_s?: number;
   transcript_ts?: Date;
@@ -45,3 +46,5 @@ type UserRead = {
   is_superuser: boolean,
   is_verified: boolean
 }
+
+class Unauthorized extends Error {}

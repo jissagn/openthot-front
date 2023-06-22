@@ -15,15 +15,15 @@ export default function InterviewForm({
     const [name, setName] = useState('');
     const [audio_file, setAudioFile] = useState<File | null>(null);
     const router = useRouter();
-    const default_name = params?.default_name? params.default_name: "Mon interview"
+    const default_name = params?.default_name ? params.default_name : "Mon interview"
 
     function handleNameChange(e: { target: { value: SetStateAction<string>; }; }) {
         setName(e.target.value);
     }
 
     function handleAudioFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-        if (e.target.files && e.target.files.length>0) {
-        setAudioFile(e?.target?.files[0]);
+        if (e.target.files && e.target.files.length > 0) {
+            setAudioFile(e?.target?.files[0]);
         }
     }
 
@@ -31,14 +31,14 @@ export default function InterviewForm({
         e.preventDefault();
         const formData = new FormData();
         formData.append('audio_file', audio_file ?? "");
-        const res = await fetch(`/api/interviews?` + new URLSearchParams({ name: name }).toString(), {
+        const url = "/api/interviews?" + new URLSearchParams({ name: name }).toString();
+        // if (name) url += "?" + new URLSearchParams({ name: name }).toString();
+        const res = await fetch(url, {
             method: 'POST',
-            body:
-                formData
+            body: formData
         });
         if (res.status == 200) {
             const json = await res.json();
-            console.log("prout");
             console.log(json);
             const id = json.data.id
             const redirect = `/interviews/${id}`
@@ -46,20 +46,19 @@ export default function InterviewForm({
             router.push(redirect);
 
         } else {
-            console.log(res.status);
-            console.log(res.json());
+            console.error(res.status, res.json());
             console.error('Post failed.')
 
         }
     }
     return (<form onSubmit={handleSubmit}>
-        <FormControl isRequired>
-            <FormLabel>Nom</FormLabel>
-            <Input placeholder={default_name} id='name' onChange={handleNameChange} />
-        </FormControl>
         <FormControl>
             <FormLabel>Fichier audio</FormLabel>
             <Input type='file' id='audio_file' onChange={handleAudioFileChange} />
+        </FormControl>
+        <FormControl>
+            <FormLabel>Nom</FormLabel>
+            <Input placeholder={default_name} id='name' onChange={handleNameChange} />
         </FormControl>
         <Button type="submit">Téléverser</Button>
     </form>)

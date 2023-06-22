@@ -11,9 +11,9 @@ import InterviewCard from '@/components/InterviewCard';
 export default async function Interview({
   params,
 }: {
-  params: { itw_id: string};
+  params: { itw_id: string };
 }) {
-  const itw: InterviewData = await getBackendData("get", `api/v1/interviews/${params.itw_id}`);
+  const itw: InterviewData = await getBackendData({ endpoint: `api/v1/interviews/${params.itw_id}`, redir: `interviews/${params.itw_id}` });
   return (
     <main>
       <InterviewCard params={{

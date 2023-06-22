@@ -39,7 +39,7 @@ export default function LoginForm() {
         const formData = new FormData();
         formData.append('username', email);
         formData.append('password', password);
-        const res = await fetch(`/api/login`, {
+        const res = await fetch(`/api/auth/jwt/login`, {
             method: 'POST',
             body: formData
         });
@@ -50,7 +50,7 @@ export default function LoginForm() {
                 router.push(redirect);
             }
             else {
-                router.push("/");
+                router.push("/interviews");
             }
         } else {
             console.error(res.status, json);

@@ -1,4 +1,5 @@
-
+import Footer from "@/components/Footer"
+import Nav from "@/components/Navbar"
 
 export default function InterviewsLayout({
   children,
@@ -6,11 +7,9 @@ export default function InterviewsLayout({
   children: React.ReactNode
 }) {
   return (
-    <section>
-    {/* Include shared UI here e.g. a header or sidebar */}
-    <nav></nav>
+    <><section>
+      <Nav>{children}</Nav>
 
-    {children}
-  </section>
+    </section><Footer></Footer></>
   )
 }

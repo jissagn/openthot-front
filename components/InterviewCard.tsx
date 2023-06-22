@@ -89,7 +89,7 @@ export default function InterviewCard({
       {itw.status != "transcripted" && (
         <><Text>Pas encore de transcript (status: {itw.status})</Text></>
       )}
-      
+
 
     </CardBody>
   </Card>)
