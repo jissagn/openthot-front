@@ -1,6 +1,3 @@
-import { getBackendData } from '@/app/back_api';
-import getFormattedTime from '@/app/time';
-import InterviewCard from '@/components/InterviewCard';
 import InterviewForm from '@/components/forms/InterviewForm';
 // import { Inter } from 'next/font/google';
 // import Image from 'next/image';

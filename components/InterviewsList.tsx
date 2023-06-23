@@ -1,6 +1,6 @@
 "use client"
 
-import { VStack } from "@chakra-ui/react"
+import { VStack, Wrap, WrapItem } from "@chakra-ui/react"
 import InterviewShortCard from "./InterviewShortCard";
 
 
@@ -17,12 +17,16 @@ export default function InterviewsList({
 
   return (
     <>
-      <VStack py={6}>
+      {/* <VStack py={6}> */}
+      <Wrap spacingX={35}>
         {itws.map((itw: InterviewData) => (
-          <InterviewShortCard params={{ interview: itw }} key={itw.id}></InterviewShortCard>
+          <WrapItem key={itw.id}>
+            <InterviewShortCard params={{ interview: itw }} ></InterviewShortCard>
+          </WrapItem>
 
         ))}
-      </VStack  >
+      </Wrap>
+      {/* </VStack  > */}
     </>
 
   )

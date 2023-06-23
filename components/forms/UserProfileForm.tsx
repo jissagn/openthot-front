@@ -11,6 +11,7 @@ import {
     Stack,
     useColorModeValue,
 } from '@chakra-ui/react';
+import { useRouter } from 'next/navigation';
 import { SetStateAction, useState } from 'react';
 
 export default function UserProfileForm({
@@ -22,6 +23,7 @@ export default function UserProfileForm({
 }): JSX.Element {
 
 
+    const router = useRouter();
     const [password, setPassword] = useState<string | null>('');
     const [email, setEmail] = useState(params.email);
 
@@ -36,6 +38,9 @@ export default function UserProfileForm({
         setPassword(password);
     }
 
+    async function handleCancel(_: any) {
+        router.back()
+    }
 
     async function handleSubmit(e: { preventDefault: () => void; }) {
         e.preventDefault();
@@ -79,20 +84,21 @@ export default function UserProfileForm({
             align={'center'}
             justify={'center'}
             bg={useColorModeValue('gray.50', 'gray.800')}>
-            <Stack
-                spacing={4}
-                w={'full'}
-                maxW={'md'}
-                bg={useColorModeValue('white', 'gray.700')}
-                rounded={'xl'}
-                boxShadow={'lg'}
-                p={6}
-                my={12}>
-                <Heading lineHeight={1.1} fontSize={{ base: '2xl', sm: '3xl' }}>
-                    Modifier ses informations
-                </Heading>
 
-                <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit}>
+                <Stack
+                    spacing={4}
+                    w={'full'}
+                    maxW={'md'}
+                    bg={useColorModeValue('white', 'gray.700')}
+                    rounded={'xl'}
+                    boxShadow={'lg'}
+                    p={6}
+                    my={12}>
+                    <Heading lineHeight={1.1} fontSize={{ base: '2xl', sm: '3xl' }}>
+                        Modifier ses informations
+                    </Heading>
+
                     {/* <FormControl id="userName">
                         <FormLabel>User Icon</FormLabel>
                         <Stack direction={['column', 'row']} spacing={6}>
@@ -142,27 +148,21 @@ export default function UserProfileForm({
                     </FormControl>
                     <Stack spacing={6} direction={['column', 'row']}>
                         <Button
-                            bg={'red.400'}
-                            color={'white'}
-                            w="full"
-                            _hover={{
-                                bg: 'red.500',
-                            }}>
+                            onClick={handleCancel}
+                            colorScheme='red'
+                            w="full">
                             Annuler
                         </Button>
                         <Button
                             type="submit"
-                            bg={'blue.400'}
-                            color={'white'}
+                            colorScheme='blue'
                             w="full"
-                            _hover={{
-                                bg: 'blue.500',
-                            }}>
+                        >
                             Mettre à jour
                         </Button>
                     </Stack>
-                </form>
-            </Stack>
+                </Stack>
+            </form>
         </Flex>
     );
 }

@@ -20,20 +20,26 @@ import {
     useColorMode,
     Center,
     HStack,
-    Text
+    Text,
+    textDecoration
 } from '@chakra-ui/react';
 import feather from '@/asset/feather.32px.png'
 import soundWave from '@/asset/sound-waves.32px.png'
+import thotDark from '@/asset/thot.512px.dark.png'
+import thotLight from '@/asset/thot.512px.light.png'
 import { MoonIcon, SunIcon, EditIcon, UnlockIcon, ChevronDownIcon, AddIcon, HamburgerIcon } from '@chakra-ui/icons';
-import { redirect, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import NextLink from 'next/link'
+
+
 const Links = ['Interviews'];
 const NavLink = ({ dest, children }: { dest: string, children: ReactNode }) => (
     <Link href={'/' + dest.toLowerCase()}>
         <Button
             variant={'ghost'}
             colorScheme={'teal'}
-            size={'sm'}
-            mr={4}
+            // size={''}
+            // mr={4}
             leftIcon={<HamburgerIcon />}
         >
 
@@ -74,18 +80,30 @@ export default function Nav({
             <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4}>
                 <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
                     <Box>
-
-                        <Stack direction={'row'} spacing={0}>
+                    <Link href='/'>
+                                <Button
+                                    variant={'ghost'}
+                                    colorScheme={'black'}
+                                    // size={'sm'}
+                                    mr={4}
+                                    leftIcon={<Image src={useColorModeValue(thotLight, thotDark)} alt='OpenThot logo' width={24} height={24}></Image>}>
+                                    OpenThot
+                                </Button></Link>
+                        {/* <Link href='/' _hover={{textDecoration: 'none', bg:'teal'}}>
+                        <Stack direction={'row'} spacing={1}>
                             <Image src={soundWave} alt='Soundwave logo' width={24} height={24}></Image>
                             <Image src={feather} alt='Feather logo' width={24} height={24}></Image>
-                            <Text>Sous-titreur</Text>
-                        </Stack></Box>
+                            <Image src={thot} alt='OpenThot logo' width={24} height={24}></Image>
+                            <Text>OpenThot</Text>
+                        </Stack>
+                        </Link> */}
+                        </Box>
                     {/* <Box></Box> */}
                     <HStack spacing={8} alignItems={'center'}>
                         <HStack
                             as={'nav'}
                             spacing={4}
-                            display={{ base: 'none', md: 'flex' }}>
+                            display={{ base: 'flex', md: 'flex' }}>
                             {Links.map((link) => (
                                 <NavLink key={link} dest={link}>{link}</NavLink>
                             ))}
@@ -93,10 +111,10 @@ export default function Nav({
                                 <Button
                                     variant={'solid'}
                                     colorScheme={'teal'}
-                                    size={'sm'}
-                                    mr={4}
+                                    // size={'sm'}
+                                    // mr={4}
                                     leftIcon={<AddIcon />}>
-                                    Ajouter
+                                    Nouvelle interview
                                 </Button></Link>
                         </HStack>
                     </HStack>
@@ -117,19 +135,6 @@ export default function Nav({
                                     Profil
                                 </MenuButton>
                                 <MenuList alignItems={'center'} >
-                                    {/* <br />
-                                    <Center>
-                                        <Avatar
-                                            size={'2xl'}
-                                            src={'https://avatars.dicebear.com/api/male/username.svg'}
-                                        />
-                                    </Center> */}
-                                    {/* <br />
-                                    <Center>
-                                        <p>Username</p>
-                                    </Center>
-                                    <br /> */}
-                                    {/* <MenuDivider /> */}
                                     <MenuItem icon={<EditIcon />} onClick={goUser}>Modifier profil</MenuItem>
                                     <MenuItem icon={<UnlockIcon />} onClick={handleLogout}>Déconnexion</MenuItem>
                                 </MenuList>

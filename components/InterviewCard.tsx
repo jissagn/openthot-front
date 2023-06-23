@@ -120,7 +120,7 @@ export default function InterviewCard({
                           {segment.words.map((word: SimpleWord) => (
                             <Text key={segment.id + "-" + word.word + "-" + word.start}
                               as="span"
-                              color={word.probability < 0.3 ? getColor(word.probability) : ""}
+                              color={word.probability < 0.2 ? getColor(word.probability) : ""}
                               onClick={(e) => { goTo(e, word.start / itw.audio_duration) }}>
                               {word.word}&ensp;
                             </Text>
