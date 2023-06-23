@@ -6,7 +6,7 @@ import { DeleteIcon } from '@chakra-ui/icons';
 import { useRouter } from "next/navigation";
 import AudioPlayer from "./AudioPlayer";
 import { MouseEvent, useContext, useRef } from "react";
-
+import pad_time from "@/app/duration";
 
 
 
@@ -19,15 +19,19 @@ export default function InterviewShortCard({
 }) {
   const router = useRouter();
   const itw = params.interview;
-  const nb_segments = itw.transcript?.segments.length ?? 1;
-  const audioDuration = itw.transcript?.segments[nb_segments - 1]?.end ?? 1;
-  // console.log(`nb_segments ${nb_segments}`);
-  // console.log(`audioDuration ${audioDuration}`);
-
-  function getColor(value: number) {
-    //value from 0 to 1
-    const hue = (value * 120).toString(10);
-    return ["hsl(", hue, ",100%,50%)"].join("");
+  // const nb_segments = itw.transcript?.segments.length ?? 1;
+  const minutes = Math.floor(itw.audio_duration / 60);
+  const seconds = (itw.audio_duration % 60); //.toFixed(3);
+  const hours = Math.floor(minutes / 60);
+  const duration = pad_time(hours) + ':' + pad_time(minutes) + ':' + pad_time(seconds, 3)
+  // const speakers = itw.speakers.map(((itw: InterviewData) => ()));
+  let nbSpeakers: number = 0;
+  // let speakers: [[string]] = [[]];
+  for (let key in itw.speakers) {
+    // let speaker_label: string = itw.speakers[key];
+    // const i = [key, speaker_label];
+    // speakers.push(i);
+    nbSpeakers += 1;
   }
 
   async function handleDelete(_: MouseEvent<HTMLButtonElement>) {
@@ -61,13 +65,13 @@ export default function InterviewShortCard({
         <Text fontWeight={600} color={'gray.500'} mb={4}>
           Créée {getFormattedTime(itw.upload_ts)}
         </Text>
-        {/* <Text fontWeight={600} color={'gray.500'} mb={4}>
-          ⌛ {itw.audio_duration}
-        </Text> */}
+        <Text fontWeight={600} color={'gray.500'} mb={4}>
+          ⌛ {duration}
+        </Text>
 
-        {itw.status == "transcripted" &&
+        {(itw.status == "transcripted" && nbSpeakers > 0) &&
           <Text fontWeight={600} color={'gray.500'} mb={4}>
-            👥 {itw.speakers && itw.speakers.length}
+            👥 {nbSpeakers} personnes
           </Text>}
         {itw.status != "transcripted" &&
           <Text fontWeight={600} color={'gray.500'} mb={4}>

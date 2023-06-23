@@ -26,10 +26,11 @@ type TimecodedLine = {
 type InterviewData = {
   name: string;
   audio_location: string;
+  audio_duration: number;
   creator_id: number;
   id: number;
   status: string;
-  speakers: Record<string, string>;
+  speakers: { [key: string]: string };
   transcript?: SimpleTranscript;
   transcript_duration_s?: number;
   transcript_ts?: Date;
@@ -47,4 +48,4 @@ type UserRead = {
   is_verified: boolean
 }
 
-class Unauthorized extends Error {}
+class Unauthorized extends Error { }

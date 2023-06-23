@@ -1,11 +1,6 @@
 "use client"
 
-import getFormattedTime from "@/app/time-ago"
-import { Box, Button, Card, CardBody, CardHeader, Center, Flex, Heading, Link, Text, VStack } from "@chakra-ui/react"
-import { useRouter } from "next/navigation";
-import AudioPlayer from "./AudioPlayer";
-import { MouseEvent, useContext, useRef } from "react";
-import InterviewCard from "./InterviewCard";
+import { VStack } from "@chakra-ui/react"
 import InterviewShortCard from "./InterviewShortCard";
 
 

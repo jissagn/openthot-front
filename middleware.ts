@@ -1,16 +1,5 @@
-import { stat } from 'fs';
-import { init } from 'next/dist/compiled/@vercel/og/satori';
+
 import { NextRequest, NextResponse } from 'next/server';
-import { exit } from 'process';
-// import { isAuthenticated } from '@lib/auth';
-
-// inspired by https://maxschmitt.me/posts/next-js-http-only-cookie-auth-tokens
-
-// import httpProxy from "http-proxy";
-// import Cookies from "cookies";
-// import url from "url";
-// import { IncomingMessage } from 'http';
-// import axios from 'axios';
 
 
 
@@ -80,9 +69,9 @@ export async function middleware(request: NextRequest) {
             try {
                 data = await backReq.json();
             } catch (error) {
-                data = null; // { "": await backReq.text() };
+                data = null;
             }
-            
+
             const response = NextResponse.json({ data }, { status: backReq.status == 204 ? 200 : backReq.status })
             if (200 <= backReq.status && backReq.status < 300) {
                 // special actions wrapping the login/logout token management
@@ -91,7 +80,6 @@ export async function middleware(request: NextRequest) {
                     response.cookies.delete("auth-token");
                 } else if (target.endsWith("/login")) {
                     const access_token = data.access_token
-                    // let response = NextResponse.json({ "details": "logged in" }, { status: backReq.status });
                     response.cookies.set('auth-token', access_token, {
                         httpOnly: true,
                         sameSite: 'strict',
@@ -107,21 +95,6 @@ export async function middleware(request: NextRequest) {
     else {
         // Pages-related
         const authToken = request.cookies.get("auth-token")?.value;
-        // if (!authToken) {
-        //     if (request.nextUrl.pathname == '/login') {
-        //         return NextResponse.next();
-        //     }
-        //     return NextResponse.redirect(new URL(`/login?redirect=${request.nextUrl.pathname}`, 'http://127.0.0.1:3000')); // TODO: redirect
-        // } else {
-        //     if (request.nextUrl.pathname == '/login') {
-        //         const redir = request.nextUrl.searchParams.get("redirect");
-        //         if (redir) {
-        //             return NextResponse.redirect(new URL(redir, request.url));
-        //         }
-
-        //     }
-        //     return NextResponse.next();
-        // }
 
         if (request.nextUrl.pathname == '/login') {
             const redir = request.nextUrl.searchParams.get("redirect");
