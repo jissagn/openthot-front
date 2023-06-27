@@ -8,11 +8,11 @@ import InterviewForm from '@/components/forms/InterviewForm';
 
 export default async function NewInterview() {
   return (
-    <main>
+    <>
       {/* <Flex> */}
         <InterviewForm params={null} />
       {/* </Flex> */}
 
-    </main>
+    </>
   )
 }

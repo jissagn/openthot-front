@@ -5,7 +5,6 @@ import InterviewShortCard from "./InterviewShortCard";
 
 
 
-
 export default function InterviewsList({
   params,
 }: {

@@ -1,15 +1,14 @@
 "use client"
 
 import getFormattedTime from "@/app/time-ago"
-import { Avatar, Badge, Box, Button, Card, CardBody, CardHeader, Center, Heading, Link, Stack, Text, useColorModeValue } from "@chakra-ui/react"
+import { Avatar, Badge, Box, Button, Card, CardBody, CardHeader, Center, Flex, HStack, Heading, Link, SimpleGrid, Stack, Tag, TagLabel, TagLeftIcon, Text, VStack, useColorModeValue } from "@chakra-ui/react"
 import { DeleteIcon } from '@chakra-ui/icons';
 import { useRouter } from "next/navigation";
 import AudioPlayer from "./AudioPlayer";
 import { MouseEvent, useContext, useRef } from "react";
 import pad_time from "@/app/duration";
 
-
-
+import { MdCalendarMonth, MdGroup, MdTimelapse } from "react-icons/md"
 export default function InterviewShortCard({
   params,
 }: {
@@ -34,6 +33,8 @@ export default function InterviewShortCard({
     nbSpeakers += 1;
   }
 
+
+
   async function handleDelete(_: MouseEvent<HTMLButtonElement>) {
     const res = await fetch(`/api/interviews/${itw.id}`, {
       method: 'DELETE',
@@ -48,62 +49,83 @@ export default function InterviewShortCard({
     }
   }
 
-  return (
-    <Center py={6}>
-      <Box
-        maxW={'480px'}
-        w={'full'}
-        bg={useColorModeValue('white', 'gray.900')}
-        boxShadow={'2xl'}
-        rounded={'lg'}
-        p={6}
-        textAlign={'center'}>
 
-        <Heading fontSize={'2xl'} fontFamily={'body'}>
-          {itw.name}
-        </Heading>
-        <Text fontWeight={600} color={'gray.500'} mb={4}>
-          Créée {getFormattedTime(itw.upload_ts)}
-        </Text>
-        <Text fontWeight={600} color={'gray.500'} mb={4}>
-          ⌛ {duration}
-        </Text>
+
+  return (
+    <Box
+      maxW={'300px'}
+      w={'full'}
+      bg={useColorModeValue('white', 'gray.900')}
+      boxShadow={'2xl'}
+      rounded={'lg'}
+      p={6}
+      textAlign={'center'}
+    >
+
+      <Heading fontSize={'2xl'}>
+        {itw.name}
+      </Heading>
+
+      <VStack p={"2"}>
+        <Tag variant={"subtle"} width={"full"} maxWidth={"150px"}>
+          <Box as={MdCalendarMonth} ml={0}
+            mr={3}></Box>
+          <TagLabel>{getFormattedTime(itw.upload_ts)}</TagLabel>
+        </Tag>
+        <Tag
+          variant={"outline"}  width={"full"} maxWidth={"150px"}
+        >
+          {/* <TagLeftIcon>
+          <Box as={MdTimelapse}  boxSize={"lg"} ></Box>
+        </TagLeftIcon> */}
+          <Box as={MdTimelapse} ml={0}
+            mr={3}></Box>
+          <TagLabel>{duration}</TagLabel>
+
+        </Tag>
 
         {(itw.status == "transcripted" && nbSpeakers > 0) &&
-          <Text fontWeight={600} color={'gray.500'} mb={4}>
-            👥 {nbSpeakers} personnes
-          </Text>}
-        {itw.status != "transcripted" &&
-          <Text fontWeight={600} color={'gray.500'} mb={4}>
-            En cours de traitement
-          </Text>
+          <Tag colorScheme="teal" variant={"outline"} width={"full"} maxWidth={"150px"}>
+            <Box as={MdGroup} ml={0}
+              mr={3}></Box>
+            <TagLabel>{nbSpeakers} personne{nbSpeakers>1 && "s"}</TagLabel>
+          </Tag>
         }
-
-        <Stack mt={8} direction={'row'} spacing={4}>
-          <Link href={"/interviews/" + itw.id}>
-            <Button
-              flex={1}
-              fontSize={'sm'}
-              rounded={'full'}
-            >
-              Consulter
-            </Button>
-          </Link>
+        {itw.status != "transcripted" &&
+          <Tag colorScheme="yellow" variant={"outline"}>
+            <TagLabel>
+              En cours de traitement
+            </TagLabel>
+          </Tag>
+        }
+      </VStack>
+      
+      <Center>
+      <HStack mt={4} spacing={4}>
+        <Link href={"/interviews/" + itw.id}>
           <Button
             flex={1}
             fontSize={'sm'}
             rounded={'full'}
-            maxW={1}
-            colorScheme={'red'}
-            boxShadow={
-              '0px 1px 25px -5px rgb(225 66 33 / 48%), 0 10px 10px -5px rgb(255 66 33 / 43%)'
-            }
-            onClick={handleDelete}
           >
-            <DeleteIcon />
+            Consulter
           </Button>
-        </Stack>
-      </Box>
-    </Center>
+        </Link>
+        <Button
+          flex={1}
+          fontSize={'sm'}
+          rounded={'full'}
+          maxW={1}
+          colorScheme={'red'}
+          boxShadow={
+            '0px 1px 25px -5px rgb(225 66 33 / 48%), 0 10px 10px -5px rgb(255 66 33 / 43%)'
+          }
+          onClick={handleDelete}
+        >
+          <DeleteIcon />
+        </Button>
+      </HStack>
+      </Center>
+    </Box>
   );
 };

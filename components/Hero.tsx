@@ -61,7 +61,7 @@ export default function Hero() {
                     </Button>
                 </Stack>
                 <VStack spacing={1} direction={'column'}>
-                    <Image src={useColorModeValue(thotLight, thotDark)} alt='Thot' width={256} height={256}></Image>
+                    <Image src={useColorModeValue(thotLight, thotDark)} alt='Thot' width={128} height={128}></Image>
                     <Heading
                         fontSize={{ base: '3xl', sm: '4xl', md: '4xl' }}
                         color={'teal'}>OpenThot</Heading>

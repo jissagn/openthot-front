@@ -1,5 +1,5 @@
 {
-  "name": "stt-front",
+  "name": "openthot-front",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -18,12 +18,13 @@
     "axios": "^1.4.0",
     "cookies": "^0.8.0",
     "eslint": "^8.38.0",
-    "eslint-config-next": "^13.3.0",
+    "eslint-config-next": "^12.0.4",
     "http-proxy": "^1.18.1",
     "javascript-time-ago": "^2.5.9",
     "next": "^13.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-icons": "^4.10.1",
     "typescript": "^5.0.4",
     "wavesurfer.js": "^6.6.3"
   },

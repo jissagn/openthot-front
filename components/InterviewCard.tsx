@@ -1,12 +1,12 @@
 "use client"
 
 import getFormattedTime from "@/app/time-ago"
-import { Box, Button, Card, CardBody, CardHeader, Container, Flex, Grid, GridItem, Heading, Text, Center } from "@chakra-ui/react"
+import { Box, IconButton, Card, CardBody, CardHeader, Container, Flex, Grid, GridItem, Heading, Text, Center, SimpleGrid, VisuallyHidden, VStack, Tooltip, Popover, PopoverTrigger, PopoverContent, PopoverBody } from "@chakra-ui/react"
 import { useRouter } from "next/navigation";
 import AudioPlayer from "./AudioPlayer";
 import { MouseEvent, useContext, useRef } from "react";
 import pad_time from "@/app/duration";
-import { DeleteIcon } from "@chakra-ui/icons";
+import { QuestionOutlineIcon } from "@chakra-ui/icons";
 
 
 
@@ -23,12 +23,14 @@ export default function InterviewCard({
   const itw = params.interview;
   const waveform = useRef<WaveSurfer | null>(null);
 
-  const tr_proc_minutes = Math.floor((itw.transcript_duration_s ?? 0) / 60);
-  const tr_proc_seconds = ((itw.transcript_duration_s ?? 0) % 60); //.toFixed(3);
-  const tr_proc_hours = Math.floor((tr_proc_minutes ?? 0) / 60);
-  const ts_proc_duration = pad_time(tr_proc_hours) + ':' + pad_time(tr_proc_minutes) + ':' + pad_time(tr_proc_seconds, 3)
+  function getTimeString(timeInSeconds: number | undefined | null): string {
+    const tr_proc_minutes = Math.floor((timeInSeconds ?? 0) / 60);
+    const tr_proc_seconds = ((timeInSeconds ?? 0) % 60); //.toFixed(3);
+    const tr_proc_hours = Math.floor((tr_proc_minutes ?? 0) / 60);
+    return pad_time(tr_proc_hours) + ':' + pad_time(tr_proc_minutes) + ':' + pad_time(tr_proc_seconds, 3)
+  }
 
-  const nb_segments = itw.transcript?.segments.length ?? 1;
+  const tsProcessingDuration = getTimeString(itw.transcript_duration_s);
 
   function getColor(value: number) {
     //value from 0 to 1
@@ -57,93 +59,85 @@ export default function InterviewCard({
 
   return (
 
-    <Grid
-      templateAreas={`"title title title"
-                  "audioreader audioreader audioreader"
-                  "details transcript transcript"
-                  "footer transcript transcript"`}
-      // gridTemplateRows={'200px'}
-      gridTemplateColumns={'300px 1fr'}
-      gap='1'
-    >
-      <GridItem area={'title'}>
-        <Center>
-          {/* <Heading fontSize={'2xl'}>{itw.name} (#{itw.id}) </Heading >&ensp; */}
-          {/* <Button
-            // flex={1}
+    <VStack ><Box w={"100%"}>
 
-            fontSize={'sm'}
-            // rounded={'full'}
-            maxW={1}
-            colorScheme={'red'}
-            onClick={handleDelete}
-          >
-            <DeleteIcon />
-          </Button> */}
-        </Center>
-      </GridItem>
-      <GridItem area={'audioreader'}>
-        {params.with_player && (
-          <AudioPlayer url={`/api/interviews/${itw.id}/audio`} waveformRef={waveform}></AudioPlayer>
-        )}
-      </GridItem>
-      <GridItem area={'details'}>
+      {params.with_player && (
+        <AudioPlayer url={`/api/interviews/${itw.id}/audio`} waveformRef={waveform}></AudioPlayer>
+      )}
+    </Box>
+      <Center><Heading fontSize={'2xl'}>{itw.name} </Heading>
+        <Popover>
+          <PopoverTrigger>
+            <IconButton aria-label="more info" variant={"unstyled"} icon={<QuestionOutlineIcon />} />
+          </PopoverTrigger>
+          <PopoverContent>
+            <PopoverBody> <Text>{itw.status} {getFormattedTime(itw.upload_ts)}</Text>
+              {(itw.transcript_duration_s ?? 0) > 0 && (
+                <Text>⚡ {tsProcessingDuration} avec {itw.transcript_source}</Text>
+              )}</PopoverBody>
+          </PopoverContent>
+        </Popover>
 
-        <Card colorScheme="gray">
-          <CardHeader><Heading fontSize={'2xl'}>{itw.name} </Heading ></CardHeader>
+      </Center>
+      {itw.transcript && (
+        <Grid
+          gridTemplateColumns={'15% 85%'}
+          columnGap={5}
+          
+          
+        >
+          {(() => {
+            const rows = [];
+            for (let i = 0; i < itw.transcript.segments.length; i++) {
+              const segment = itw.transcript.segments[i];
+              const previousSegment = i > 0 ? itw.transcript.segments[i - 1] : null;
+              const rendered = (
+                <>
+                  <GridItem></GridItem>
+                  <GridItem>   {segment.speaker && (previousSegment == null || segment.speaker != previousSegment.speaker) &&
+                    <Text marginTop={"5"} marginBottom={"2"} color={"gray"}>
 
-          <Text>{itw.audio_location}</Text>
-          <CardBody>
-            <Text>{itw.status} {getFormattedTime(itw.upload_ts)}</Text>
-            {(itw.transcript_duration_s ?? 0) > 0 && (
-              <Text>⚡ {ts_proc_duration} avec {itw.transcript_source}</Text>
-            )}
-          </CardBody>
-        </Card>
-      </GridItem>
-      <GridItem area={'transcript'}>
+                      {getTimeString(Math.round(segment.start))}</Text>}
+                  </GridItem>
+                  <GridItem textAlign={'right'} minW={"100"}>
+                    {segment.speaker && (previousSegment == null || segment.speaker != previousSegment.speaker) &&
+                      <Text as="span" fontWeight={"extrabold"}>
+                        {itw.speakers[segment.speaker]}
+                      </Text>}
+                    {!segment.speaker &&
+                      <VisuallyHidden></VisuallyHidden>}
 
-
-        <Card>
-          <CardBody>
-            {itw.transcript && (
-              <>
-                {(() => {
-                  const rows = [];
-                  for (let i = 0; i < itw.transcript.segments.length; i++) {
-                    const segment = itw.transcript.segments[i];
-                    const previousSegment = i > 0 ? itw.transcript.segments[i - 1] : null;
-                    const rendered = (
-                      <span key={segment.id}>
-                        {segment.speaker && (previousSegment == null || segment.speaker != previousSegment.speaker) && <Text as="span" fontWeight={"extrabold"} >{itw.speakers[segment.speaker]} </Text>}
-                        <Text pl={6}>
-                          {segment.words.map((word: SimpleWord) => (
-                            <Text key={segment.id + "-" + word.word + "-" + word.start}
-                              as="span"
-                              color={word.probability < 0.2 ? getColor(word.probability) : ""}
-                              onClick={(e) => { goTo(e, word.start / itw.audio_duration) }}>
-                              {word.word}&ensp;
-                            </Text>
-                          )
-
-                          )}
+                  </GridItem>
+                  <GridItem>
+                    <Text>
+                      {segment.words.map((word: SimpleWord) => (
+                        <Text key={segment.id + "-" + word.word + "-" + word.start}
+                          as="span"
+                          color={word.probability < 0.2 ? getColor(word.probability) : ""}
+                          onClick={(e) => { goTo(e, word.start / itw.audio_duration); }}>
+                          {word.word}&ensp;
                         </Text>
-                      </span>)
-                    rows.push(rendered)
-                  }
-                  return rows;
-                })()}
-              </>
-            )}
-            {itw.status != "transcripted" && (
-              <><Text>Pas encore de transcript (status: {itw.status})</Text></>
-            )}
-          </CardBody></Card>
+                      )
+
+                      )}
+                    </Text>
+
+                  </GridItem>
+                </>
+              );
+              rows.push(rendered);
+
+            }
+            return rows;
+          })()}
+        </Grid>
+      )}
+      {itw.status != "transcripted" && (
+        <><Text>Pas encore de transcript (status: {itw.status})</Text></>
+      )}
+    </VStack>
 
 
-      </GridItem>
-      {/* <GridItem area={'footer'}></GridItem> */}
-    </Grid>
 
   )
 };

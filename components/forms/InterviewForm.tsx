@@ -1,7 +1,6 @@
 "use client"
 
-import { FormLabel, FormControl, Input, Button } from "@chakra-ui/react";
-// import { FormControl, Input, Button } from "chakra-ui";
+import { FormLabel, FormControl, Input, Button, Center } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { SetStateAction, useState } from "react";
 
@@ -51,16 +50,21 @@ export default function InterviewForm({
 
         }
     }
-    return (<form onSubmit={handleSubmit}>
-        <FormControl>
-            <FormLabel>Fichier audio</FormLabel>
-            <Input type='file' id='audio_file' onChange={handleAudioFileChange} />
-        </FormControl>
-        <FormControl>
-            <FormLabel>Nom</FormLabel>
-            <Input placeholder={default_name} id='name' onChange={handleNameChange} />
-        </FormControl>
-        <Button type="submit">Téléverser</Button>
-    </form>)
+    return (
+        <Center>
+            <form onSubmit={handleSubmit}>
+                <FormControl>
+                    <FormLabel>Fichier audio</FormLabel>
+                    <Input type='file' id='audio_file' onChange={handleAudioFileChange} />
+                </FormControl>
+                <FormControl>
+                    <FormLabel>Nom</FormLabel>
+                    <Input placeholder={default_name} id='name' onChange={handleNameChange} />
+                </FormControl>
+                <Center>
+                    <Button marginTop={3} type="submit">Créer nouvelle interview</Button>
+                </Center>
+            </form>
+        </Center>)
 };
 

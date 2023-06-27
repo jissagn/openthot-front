@@ -7,9 +7,11 @@ export default function InterviewsLayout({
   children: React.ReactNode
 }) {
   return (
-    <><section>
-      <Nav>{children}</Nav>
-
-    </section><Footer></Footer></>
+    <>
+      <section>
+        <Nav>{children}</Nav>
+      </section>
+      <Footer></Footer>
+    </>
   )
 }
