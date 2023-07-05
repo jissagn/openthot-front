@@ -1,7 +1,7 @@
 "use client"
 
 import getFormattedTime from "@/app/time-ago"
-import { Avatar, Badge, Box, Button, Card, CardBody, CardHeader, Center, Flex, HStack, Heading, Link, SimpleGrid, Stack, Tag, TagLabel, TagLeftIcon, Text, VStack, useColorModeValue } from "@chakra-ui/react"
+import { Avatar, Badge, Box, Button, Card, CardBody, CardHeader, Center, Container, Flex, HStack, Heading, Link, SimpleGrid, Stack, Tag, TagLabel, TagLeftIcon, Text, VStack, useColorModeValue } from "@chakra-ui/react"
 import { DeleteIcon } from '@chakra-ui/icons';
 import { useRouter } from "next/navigation";
 import AudioPlayer from "./AudioPlayer";
@@ -49,83 +49,97 @@ export default function InterviewShortCard({
     }
   }
 
+  function shortenString(str: string, maxLenght: number): string {
+    if (str.length > maxLenght) {
+      return str.substring(0, maxLenght - 3) + "..."
+    } else {
+      return str
+    }
+  }
 
 
   return (
     <Box
-      maxW={'300px'}
+      maxW={300}
+      minW={300}
+      minH={250}
+      maxH={250}
       w={'full'}
       bg={useColorModeValue('white', 'gray.900')}
       boxShadow={'2xl'}
       rounded={'lg'}
-      p={6}
+      p={4}
       textAlign={'center'}
+      alignItems={'center'}
     >
 
-      <Heading fontSize={'2xl'}>
-        {itw.name}
-      </Heading>
+      <Container
+        centerContent>
+        <Heading fontSize={'2xl'}>
+          {shortenString(itw.name, 20)}
+        </Heading>
 
-      <VStack p={"2"}>
-        <Tag variant={"subtle"} width={"full"} maxWidth={"150px"}>
-          <Box as={MdCalendarMonth} ml={0}
-            mr={3}></Box>
-          <TagLabel>{getFormattedTime(itw.upload_ts)}</TagLabel>
-        </Tag>
-        <Tag
-          variant={"outline"}  width={"full"} maxWidth={"150px"}
-        >
-          {/* <TagLeftIcon>
+        <VStack p={"2"}>
+          <Tag variant={"subtle"} width={"full"} maxWidth={"150px"}>
+            <Box as={MdCalendarMonth} ml={0}
+              mr={3}></Box>
+            <TagLabel>{getFormattedTime(itw.upload_ts)}</TagLabel>
+          </Tag>
+          <Tag
+            variant={"outline"} width={"full"} maxWidth={"150px"}
+          >
+            {/* <TagLeftIcon>
           <Box as={MdTimelapse}  boxSize={"lg"} ></Box>
         </TagLeftIcon> */}
-          <Box as={MdTimelapse} ml={0}
-            mr={3}></Box>
-          <TagLabel>{duration}</TagLabel>
-
-        </Tag>
-
-        {(itw.status == "transcripted" && nbSpeakers > 0) &&
-          <Tag colorScheme="teal" variant={"outline"} width={"full"} maxWidth={"150px"}>
-            <Box as={MdGroup} ml={0}
+            <Box as={MdTimelapse} ml={0}
               mr={3}></Box>
-            <TagLabel>{nbSpeakers} personne{nbSpeakers>1 && "s"}</TagLabel>
+            <TagLabel>{duration}</TagLabel>
+
           </Tag>
-        }
-        {itw.status != "transcripted" &&
-          <Tag colorScheme="yellow" variant={"outline"}>
-            <TagLabel>
-              En cours de traitement
-            </TagLabel>
-          </Tag>
-        }
-      </VStack>
-      
-      <Center>
-      <HStack mt={4} spacing={4}>
-        <Link href={"/interviews/" + itw.id}>
-          <Button
-            flex={1}
-            fontSize={'sm'}
-            rounded={'full'}
-          >
-            Consulter
-          </Button>
-        </Link>
-        <Button
-          flex={1}
-          fontSize={'sm'}
-          rounded={'full'}
-          maxW={1}
-          colorScheme={'red'}
-          boxShadow={
-            '0px 1px 25px -5px rgb(225 66 33 / 48%), 0 10px 10px -5px rgb(255 66 33 / 43%)'
+
+          {(itw.status == "transcripted" && nbSpeakers > 0) &&
+            <Tag colorScheme="teal" variant={"outline"} width={"full"} maxWidth={"150px"}>
+              <Box as={MdGroup} ml={0}
+                mr={3}></Box>
+              <TagLabel>{nbSpeakers} personne{nbSpeakers > 1 && "s"}</TagLabel>
+            </Tag>
           }
-          onClick={handleDelete}
-        >
-          <DeleteIcon />
-        </Button>
-      </HStack>
-      </Center>
+          {itw.status != "transcripted" &&
+            <Tag colorScheme="yellow" variant={"outline"}>
+              <TagLabel>
+                En cours de traitement
+              </TagLabel>
+            </Tag>
+          }
+        </VStack>
+
+        <Center>
+          <HStack mt={4} spacing={4}>
+            <Link href={"/interviews/" + itw.id}>
+              <Button
+                flex={1}
+                fontSize={'sm'}
+                rounded={'full'}
+              >
+                Consulter
+              </Button>
+            </Link>
+            <Button
+              flex={1}
+              fontSize={'sm'}
+              rounded={'full'}
+              maxW={1}
+              colorScheme={'red'}
+              boxShadow={
+                '0px 1px 25px -5px rgb(225 66 33 / 48%), 0 10px 10px -5px rgb(255 66 33 / 43%)'
+              }
+              onClick={handleDelete}
+            >
+              <DeleteIcon />
+            </Button>
+          </HStack>
+        </Center>
+      </Container>
     </Box>
   );
 };

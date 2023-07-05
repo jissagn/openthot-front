@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-const url = "http://127.0.0.1:8000/";
+const url = process.env.BACKEND_API; // "http://127.0.0.1:8000/";
 
 export async function getBackendData({ endpoint, body = null, redir = null }: { endpoint: string, body?: any, redir?: string | null }): Promise<any> {
 
@@ -28,7 +28,7 @@ export async function getBackendData({ endpoint, body = null, redir = null }: { 
     }
     console.error(res.status, json)
     // This will activate the closest `error.js` Error Boundary
-    throw new Error(`Failed to fetch data from ${endpoint}: ${res.status} | ${json["detail"]}`);
+    throw new Error(`Failed to fetch data from ${endpoint}: ${res.status} | ${JSON.stringify(json["detail"])}`);
   }
 
   return await res.json();

@@ -59,12 +59,15 @@ export default function InterviewCard({
 
   return (
 
-    <VStack ><Box w={"100%"}>
+    <><VStack>
+      <Box w={"100%"}
+        sx={{ position: 'sticky', top: '0', }} // , /* Safari */ position: 'sticky', top: '0', 
+      >
 
-      {params.with_player && (
-        <AudioPlayer url={`/api/interviews/${itw.id}/audio`} waveformRef={waveform}></AudioPlayer>
-      )}
-    </Box>
+        {params.with_player && (
+          <AudioPlayer url={`/api/interviews/${itw.id}/audio`} waveformRef={waveform}></AudioPlayer>
+        )}
+      </Box>
       <Center><Heading fontSize={'2xl'}>{itw.name} </Heading>
         <Popover>
           <PopoverTrigger>
@@ -79,65 +82,64 @@ export default function InterviewCard({
         </Popover>
 
       </Center>
-      {itw.transcript && (
-        <Grid
-          gridTemplateColumns={'15% 85%'}
-          columnGap={5}
-          
-          
-        >
-          {(() => {
-            const rows = [];
-            for (let i = 0; i < itw.transcript.segments.length; i++) {
-              const segment = itw.transcript.segments[i];
-              const previousSegment = i > 0 ? itw.transcript.segments[i - 1] : null;
-              const rendered = (
-                <>
-                  <GridItem></GridItem>
-                  <GridItem>   {segment.speaker && (previousSegment == null || segment.speaker != previousSegment.speaker) &&
-                    <Text marginTop={"5"} marginBottom={"2"} color={"gray"}>
-
-                      {getTimeString(Math.round(segment.start))}</Text>}
-                  </GridItem>
-                  <GridItem textAlign={'right'} minW={"100"}>
-                    {segment.speaker && (previousSegment == null || segment.speaker != previousSegment.speaker) &&
-                      <Text as="span" fontWeight={"extrabold"}>
-                        {itw.speakers[segment.speaker]}
-                      </Text>}
-                    {!segment.speaker &&
-                      <VisuallyHidden></VisuallyHidden>}
-
-                  </GridItem>
-                  <GridItem>
-                    <Text>
-                      {segment.words.map((word: SimpleWord) => (
-                        <Text key={segment.id + "-" + word.word + "-" + word.start}
-                          as="span"
-                          color={word.probability < 0.2 ? getColor(word.probability) : ""}
-                          onClick={(e) => { goTo(e, word.start / itw.audio_duration); }}>
-                          {word.word}&ensp;
-                        </Text>
-                      )
-
-                      )}
-                    </Text>
-
-                  </GridItem>
-                </>
-              );
-              rows.push(rendered);
-
-            }
-            return rows;
-          })()}
-        </Grid>
-      )}
-      {itw.status != "transcripted" && (
-        <><Text>Pas encore de transcript (status: {itw.status})</Text></>
-      )}
-    </VStack>
+      <Container maxW={"800"}>
+        {itw.transcript && (
+          <Grid
+            gridTemplateColumns={'15% 85%'}
+            columnGap={5}
 
 
+          >
+            {(() => {
+              const rows = [];
+              for (let i = 0; i < itw.transcript.segments.length; i++) {
+                const segment = itw.transcript.segments[i];
+                const previousSegment = i > 0 ? itw.transcript.segments[i - 1] : null;
+                const rendered = (
+                  <>
+                    <GridItem></GridItem>
+                    <GridItem>   {segment.speaker && (previousSegment == null || segment.speaker != previousSegment.speaker) &&
+                      <Text marginTop={"6"} marginBottom={"1"} color={"gray"}>
 
+                        {getTimeString(Math.round(segment.start))}</Text>}
+                    </GridItem>
+                    <GridItem textAlign={'right'}>
+                      {segment.speaker && (previousSegment == null || segment.speaker != previousSegment.speaker) &&
+                        <Text as="span" fontWeight={"extrabold"}>
+                          {itw.speakers[segment.speaker]}
+                        </Text>}
+                      {!segment.speaker &&
+                        <VisuallyHidden></VisuallyHidden>}
+
+                    </GridItem>
+                    <GridItem>
+                      <Text>
+                        {segment.words.map((word: SimpleWord) => (
+                          <Text key={segment.id + "-" + word.word + "-" + word.start}
+                            as="span"
+                            color={word.probability < 0.2 ? getColor(word.probability) : ""}
+                            onClick={(e) => { goTo(e, word.start / itw.audio_duration); }}>
+                            {word.word}&ensp;
+                          </Text>
+                        )
+
+                        )}
+                      </Text>
+
+                    </GridItem>
+                  </>
+                );
+                rows.push(rendered);
+
+              }
+              return rows;
+            })()}
+          </Grid>
+        )}
+        {itw.status != "transcripted" && (
+          <><Text>Pas encore de transcript (status: {itw.status})</Text></>
+        )}
+      </Container>
+    </VStack></>
   )
 };

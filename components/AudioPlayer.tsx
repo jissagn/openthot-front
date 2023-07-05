@@ -2,7 +2,8 @@
 // AND  https://blog.logrocket.com/building-audio-player-react/
 
 "use client"
-import { Button, Flex } from "@chakra-ui/react";
+import { Button, Flex, useColorModeValue } from "@chakra-ui/react";
+import { Fixed } from "chakra-ui";
 import { MutableRefObject, RefObject, useEffect, useRef } from "react";
 import Wavesurfer from "wavesurfer.js";
 
@@ -16,12 +17,14 @@ export default function AudioPlayer({ url, waveformRef }: { url: string, wavefor
             // More info about options here https://wavesurfer-js.org/docs/options.html
             waveformRef.current = Wavesurfer.create({
                 container: "#waveform",
-                waveColor: "#567FFF",
+                waveColor: "#808080", //"#567FFF",
                 barGap: 2,
                 barWidth: 3,
                 barRadius: 3,
                 cursorWidth: 3,
-                cursorColor: "#567FFF",
+                cursorColor: "#008080",//"#567FFF",
+                progressColor: "#008080",
+                height: 50,
             });
 
             // Load audio from a remote url.
@@ -42,10 +45,17 @@ export default function AudioPlayer({ url, waveformRef }: { url: string, wavefor
     };
 
     return (
-        <Flex flexDirection="column" w="100%">
-            <div id="waveform"/>
+        <Flex flexDirection="column" w="100%" 
+        // bg={"blackAlpha.100"}
+        paddingTop={1}
+        paddingBottom={2}
+        boxShadow={`0px 5px 5px ${useColorModeValue('white', '#1a202c')}`}
+        // shadow={"base"}
+        backgroundColor={useColorModeValue('white', '#1a202c')}
+        >
+            <div id="waveform" />
             <Flex flexDirection="row" justifyContent="center">
-                <Button m="4" onClick={playAudio}>
+                <Button onClick={playAudio}>
                     Play / Pause
                 </Button>
             </Flex>

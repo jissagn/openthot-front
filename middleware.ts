@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 
 
-const API_BASE_URL = "http://127.0.0.1:8000/";
+const API_BASE_URL = process.env.BACKEND_API; //"http://127.0.0.1:8000/";
 const API_URL = API_BASE_URL + "api/v1/"; // TODO:
 
 
@@ -47,6 +47,7 @@ export async function middleware(request: NextRequest) {
             // as it causes "bug" on backend and returns 4XX
         }
 
+        console.log(target)
         // 2. Make the call to backend
         const backReq = await fetch(target,
             {
@@ -100,7 +101,7 @@ export async function middleware(request: NextRequest) {
             const redir = request.nextUrl.searchParams.get("redirect");
             if (authToken && redir) return NextResponse.redirect(new URL(redir, request.url));
         } else {
-            if (!authToken) NextResponse.redirect(new URL(`/login?redirect=${request.nextUrl.pathname}`, 'http://127.0.0.1:3000'));
+            if (!authToken) return NextResponse.redirect(new URL(`/login?redirect=${request.nextUrl.pathname}`, 'http://127.0.0.1:3000'));
         }
 
         return NextResponse.next();

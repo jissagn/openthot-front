@@ -16,8 +16,7 @@ export default function InterviewsList({
 
   return (
     <>
-      {/* <VStack py={6}> */}
-      <Wrap spacingX={35}>
+      <Wrap spacing={30} >
         {itws.map((itw: InterviewData) => (
           <WrapItem key={itw.id}>
             <InterviewShortCard params={{ interview: itw }} ></InterviewShortCard>
@@ -25,7 +24,6 @@ export default function InterviewsList({
 
         ))}
       </Wrap>
-      {/* </VStack  > */}
     </>
 
   )
